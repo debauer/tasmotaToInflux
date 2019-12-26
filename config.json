@@ -1,0 +1,24 @@
+{
+  "environment": "develop",
+  "develop": {
+    "mqtt": {
+      "Broker": {
+        "ip": "herbert",
+        "port": 1234,
+        "auth": false,
+        "user": "adam",
+        "password": "eva"
+      }
+    },
+    "influx": {
+      "bulk_size": 5,
+      "database": {
+        "ip": "localhost",
+        "port": 8086,
+        "auth": false,
+        "user": "root",
+        "password": "root"
+      }
+    }
+  }
+}
