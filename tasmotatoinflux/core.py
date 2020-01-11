@@ -67,8 +67,7 @@ def on_ds18b20(mosq, obj, message):
                         "rom_id": config_data['Id']
                     },
                     "fields": {
-                        'Temperature': temperature,
-                        'increases': int(temperature > 0.0)
+                        'Temperature': temperature
                     }
                 }]
                 print(jsondata)
