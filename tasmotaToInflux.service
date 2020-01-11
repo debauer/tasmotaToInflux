@@ -1,0 +1,20 @@
+[Unit]
+Description=tasmotaToInflux
+After=syslog.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/tasmotatoinflux/tasmotaToInflux
+ExecStart=/usr/bin/python3 -m tasmotatoinflux
+Environment=PYTHONUNBUFFERED=1
+User=tasmotatoinflux
+Group=tasmotatoinflux
+
+SyslogIdentifier=tasmotatoinflux
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

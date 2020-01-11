@@ -9,10 +9,10 @@ teleSensor = {"Time": "2019-12-19T15:32:04",
 
 json_body = [
     {
-        "measurement": "cpu_load_short",
+        "measurement": "onewire",
         "tags": {
-            "host": "server01",
-            "region": "us-west"
+            "name": "vorlauf_fussbodenheizung",
+            "rom_id": "28-01143f625baa"
         },
         "time": "2009-11-10T23:00:00Z",
         "fields": {
