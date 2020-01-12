@@ -16,6 +16,7 @@ else:
 influxc = InfluxDBClient('herbert', 8086, 'root', 'root', 'tasmotaToInflux')
 mqttc = mqtt.Client()
 
+
 def getOneWireConfig(id):
     global devices
     for d in devices.onewire:
@@ -30,30 +31,25 @@ def getOneWireConfig(id):
 
 
 def on_blitzwolf(mosq, obj, message):
-    data = message.topic.split("/")
-    device = data[3]
-    topic = data[4]
-    prefix = data[2]
-    devicegroup = data[1]
-    roomgroup = data[0]
-    if topic == 'LWT':
-        pass
-    elif topic == 'SENSOR':
+    topic_split = message.topic.split("/")
+    topic = topic_split[0] + '_' + topic_split[1]
+    if topic_split[4] == 'SENSOR':
         jd = json.loads(message.payload)
-        #print(flatten(jd))
-        #if "ENERGY" in jd:
-        #    print(jd["ENERGY"])
-    elif topic == 'STATE':
-        pass
-    else:
-        pass
-        #print("%s %s %s %s %s" % (roomgroup, devicegroup, prefix, device, topic))
-        #print(message.payload)
+        if "ENERGY" in jd:
+            jsondata = [{
+                "measurement": topic,
+                "tags": {
+                    "name": topic_split[3]
+                },
+                "fields": jd["ENERGY"]
+            }]
+            #print(jsondata)
+            influxc.write_points(jsondata)
 
 
 def on_ds18b20(mosq, obj, message):
     topic_split = message.topic.split("/")
-    topic = topic_split[0]+'_'+topic_split[1]+'_'+topic_split[3]
+    topic = topic_split[0] + '_' + topic_split[1] + '_' + topic_split[3]
     if topic_split[4] == 'SENSOR':
         jd = json.loads(message.payload)
         for k in jd:
@@ -70,13 +66,13 @@ def on_ds18b20(mosq, obj, message):
                         'Temperature': temperature
                     }
                 }]
-                print(jsondata)
+                #print(jsondata)
                 influxc.write_points(jsondata)
+
 
 def on_generic(mosq, obj, message):
     print(message.topic)
     pass
-
 
 
 mqttc.message_callback_add("ug/temperaturen/+/+/#", on_ds18b20)
