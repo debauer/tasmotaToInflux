@@ -13,7 +13,7 @@
     "influx": {
       "bulk_size": 5,
       "database": {
-        "ip": "herbert",
+        "ip": "localhost",
         "port": 8086,
         "auth": false,
         "user": "root",

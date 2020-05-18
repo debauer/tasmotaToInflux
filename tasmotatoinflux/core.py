@@ -16,6 +16,7 @@ else:
 influxc = InfluxDBClient('herbert', 8086, 'root', 'root', 'tasmotaToInflux')
 mqttc = mqtt.Client()
 
+blacklist = ["Time", "Sleepmode", "Sleep"]
 
 def getOneWireConfig(id):
     global devices
@@ -43,11 +44,11 @@ def on_blitzwolf(mosq, obj, message):
                 },
                 "fields": jd["ENERGY"]
             }]
-            #print(jsondata)
+            # print(jsondata)
             influxc.write_points(jsondata)
 
 
-def on_ds18b20(mosq, obj, message):
+def ds18b20(mosq, obj, message):
     topic_split = message.topic.split("/")
     topic = topic_split[0] + '_' + topic_split[1] + '_' + topic_split[3]
     if topic_split[4] == 'SENSOR':
@@ -66,17 +67,28 @@ def on_ds18b20(mosq, obj, message):
                         'Temperature': temperature
                     }
                 }]
-                #print(jsondata)
                 influxc.write_points(jsondata)
 
 
-def on_generic(mosq, obj, message):
-    print(message.topic)
-    pass
+def on_message(mosq, obj, message):
+    topic_split = message.topic.split("/")
+    topic = topic_split[0] + '_' + topic_split[1]
+    if topic_split[4] == 'SENSOR':
+        jd = json.loads(message.payload)
+        for key in jd:
+            if key in blacklist:
+                break
+            if key[:7] == "DS18B20":
+            jsondata = {
+                "measurement": topic,
+                "tags": {
+                    "name": topic_split[3]
+                },
+                "fields": jd[key]
+            }
+            influxc.write_points([jsondata])
 
-
-mqttc.message_callback_add("ug/temperaturen/+/+/#", on_ds18b20)
-mqttc.message_callback_add("ew/steckdosen/+/+/#", on_blitzwolf)
+mqttc.message_callback_add("ew/steckdosen/+/+/#", on_message)
 mqttc.on_message = on_generic
 mqttc.connect(config.mqtt.broker.ip, config.mqtt.broker.port, 60)
 mqttc.subscribe("#", 0)
