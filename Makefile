@@ -11,9 +11,11 @@ init-docker:
 	sudo mkdir -p /srv/docker/grafana/data
 	sudo chown 472:472 /srv/docker/grafana/data
 	sudo mkdir -p /srv/docker/influxdb/data
+	sudo systemctl start docker
 	sudo docker pull grafana/grafana
 	sudo docker pull influxdb
 run-docker:
+	sudo systemctl start docker
 	sudo docker-compose up -d
 stop-docker:
 	sudo docker-compose stop

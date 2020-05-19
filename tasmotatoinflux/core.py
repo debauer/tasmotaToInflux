@@ -13,10 +13,11 @@ if config.environment == "production":
 else:
     config = config.develop
 
-influxc = InfluxDBClient('herbert', 8086, 'root', 'root', 'tasmotaToInflux')
+influxc = InfluxDBClient('localhost', 8086, 'root', 'root', 'tasmotaToInflux')
 mqttc = mqtt.Client()
 
-blacklist = ["Time", "Sleepmode", "Sleep"]
+blacklist = ["Time", "Sleepmode", "Sleep", "PressureUnit", "TempUnit"]
+
 
 def getOneWireConfig(id):
     global devices
@@ -31,64 +32,51 @@ def getOneWireConfig(id):
     return default
 
 
-def on_blitzwolf(mosq, obj, message):
-    topic_split = message.topic.split("/")
-    topic = topic_split[0] + '_' + topic_split[1]
-    if topic_split[4] == 'SENSOR':
-        jd = json.loads(message.payload)
-        if "ENERGY" in jd:
-            jsondata = [{
-                "measurement": topic,
-                "tags": {
-                    "name": topic_split[3]
-                },
-                "fields": jd["ENERGY"]
-            }]
-            # print(jsondata)
-            influxc.write_points(jsondata)
-
-
-def ds18b20(mosq, obj, message):
-    topic_split = message.topic.split("/")
-    topic = topic_split[0] + '_' + topic_split[1] + '_' + topic_split[3]
-    if topic_split[4] == 'SENSOR':
-        jd = json.loads(message.payload)
-        for k in jd:
-            if k[:7] == "DS18B20":
-                config_data = getOneWireConfig(jd[k]['Id'])
-                temperature = float(jd[k]['Temperature'])
-                jsondata = [{
-                    "measurement": topic,
-                    "tags": {
-                        "name": config_data['Name'],
-                        "rom_id": config_data['Id']
-                    },
-                    "fields": {
-                        'Temperature': temperature
-                    }
-                }]
-                influxc.write_points(jsondata)
-
-
 def on_message(mosq, obj, message):
+    # print("topic:" + message.topic)
+    # print("payload:" + str(message.payload))
     topic_split = message.topic.split("/")
-    topic = topic_split[0] + '_' + topic_split[1]
-    if topic_split[4] == 'SENSOR':
-        jd = json.loads(message.payload)
-        for key in jd:
-            if key in blacklist:
-                break
-            if key[:7] == "DS18B20":
-            jsondata = {
-                "measurement": topic,
-                "tags": {
-                    "name": topic_split[3]
-                },
-                "fields": jd[key]
-            }
-            influxc.write_points([jsondata])
+    # print("topic_split:" + str(topic_split))
+    try:
+        if topic_split[4] == 'SENSOR':
+            jd = json.loads(message.payload)
+            for key in jd:
+                # print("key: " + key)
+                if key[:7] == "DS18B20":
+                    topic = topic_split[0] + '_' + topic_split[1] + '_' + topic_split[3]
+                    config_data = getOneWireConfig(jd[key]['Id'])
+                    temperature = float(jd[key]['Temperature'])
+                    jsondata = [{
+                        "measurement": topic,
+                        "tags": {
+                            "name": config_data['Name'],
+                            "rom_id": config_data['Id']
+                        },
+                        "fields": {
+                            'Temperature': temperature
+                        }
+                    }]
+                    influxc.write_points(jsondata)
+                elif key not in blacklist:
+                    topic = topic_split[0] + '_' + topic_split[1]
+                    jsondata = [{
+                        "measurement": topic,
+                        "tags": {
+                            "name": topic_split[3]
+                        },
+                        "fields": jd[key]
+                    }]
+                    influxc.write_points(jsondata)
+    except:
+        print("error on name: " + topic_split[3] + " topic: " + topic)
 
-mqttc.message_callback_add("ew/steckdosen/+/+/#", on_message)
+
+def on_generic(mosq, obj, message):
+    pass
+    # print("generic:" + message.topic)
+
+
+mqttc.message_callback_add("+/+/tele/+/#", on_message)
 mqttc.on_message = on_generic
 mqttc.connect(config.mqtt.broker.ip, config.mqtt.broker.port, 60)
 mqttc.subscribe("#", 0)
