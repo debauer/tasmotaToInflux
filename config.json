@@ -52,6 +52,16 @@
         "Name": "warmwasser",
         "Beschreibung": "Warmwasser",
         "Id": "28-01143f683aaa"
+      },
+      {
+        "Name": "teich",
+        "Beschreibung": "Teich",
+        "Id": "28-011927CADC65"
+      },
+      {
+        "Name": "gartenboden",
+        "Beschreibung": "Boden",
+        "Id": "28-011927A00E0F"
       }
     ]
   }
