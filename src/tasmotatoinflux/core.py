@@ -7,7 +7,7 @@ from tasmotatoinflux.config import ConfigWrapper
 from tasmotatoinflux.points import InfluxPoint
 
 
-def main() -> None:
+def core() -> None:
     def on_message(mosq, obj, message) -> None:
         topic_split = message.topic.split("/")
         if topic_split[4] == "SENSOR":
@@ -45,4 +45,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    core()

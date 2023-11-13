@@ -1,3 +1,3 @@
-from .core import Core
+from tasmotatoinflux.core import core
 
-Core()
+core()
