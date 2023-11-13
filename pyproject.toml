@@ -19,6 +19,9 @@ tams = "tasmotatoinflux.core:core"
 python = "^3.10"
 influxdb = "^5.3.1"
 overrides = "^7.3.1"
+flatten-json = "^0.1.14"
+python-json-config = "^1.2.3"
+paho-mqtt = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
 types-requests = "^2.27.30"

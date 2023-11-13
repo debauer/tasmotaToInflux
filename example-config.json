@@ -1,0 +1,23 @@
+{
+  "mqtt": {
+    "broker": {
+      "ip": "herbert",
+      "port": 1883,
+      "auth": false,
+      "user": "adam",
+      "password": "eva"
+    }
+  },
+  "influxdb": {
+    "bulk_size": 5,
+    "database": {
+      "ip": "localhost",
+      "port": 8086,
+      "auth": false,
+      "user": "tasmota",
+      "password": "asdf",
+      "name": "tasmota"
+    }
+  }
+}
+
