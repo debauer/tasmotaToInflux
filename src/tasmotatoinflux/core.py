@@ -1,10 +1,19 @@
+from argparse import ArgumentParser
+
 from influxdb import InfluxDBClient
-from python_json_config import ConfigBuilder
 import json
 import paho.mqtt.client as mqtt
 
-from tasmotatoinflux.config import ConfigWrapper
+from tasmotatoinflux.config_wrapper.wrapper import ConfigWrapper
+from tasmotatoinflux.config import DEVICES, INFLUX_DB, MQTT_BROKER
 from tasmotatoinflux.points import InfluxPoint
+
+
+def parse():
+    parser = ArgumentParser(description="System to record the data on a trimodal crane")
+    parser.add_argument("-d", "--dryrun", action="store_const", const="dryrun", help="don't commit to influxdb")
+    parser.add_argument("-v", "--verbose", action="store_const", const="verbose", help="verbose")
+    return parser.parse_args()
 
 
 def core() -> None:
@@ -14,32 +23,39 @@ def core() -> None:
             jd: dict = json.loads(message.payload)
             if isinstance(jd, dict):
                 points = InfluxPoint(topic_split, jd, config)
-                try:
-                    influxc.write_points(points.datapoints)
-                except Exception as e:
-                    print(f"error on name: {topic_split[3]} topic: {message.topic}")
-                    print(f"{e}")
+                if verbose:
+                    print(points)
+                if not dryrun:
+                    try:
+                        influxc.write_points(points.datapoints)
+                    except Exception as e:
+                        print(f"error on name: {topic_split[3]} topic: {message.topic}")
+                        print(f"{e}")
 
     def on_generic(mosq, obj, message) -> None:
         pass
         # print("generic:" + message.topic)
 
-    builder = ConfigBuilder()
-    config = builder.parse_config("config.json")
-
-    config = ConfigWrapper(config)
-
-    influxc = InfluxDBClient(
-        config.influxdb.database.ip,
-        config.influxdb.database.port,
-        config.influxdb.database.user,
-        config.influxdb.database.password,
-        config.influxdb.database.name,
+    config = ConfigWrapper(
+        MQTT_BROKER, INFLUX_DB, DEVICES
     )
+
+    args = parse()
+    dryrun = args.dryrun
+    verbose = args.verbose
+
+    if not dryrun:
+        influxc = InfluxDBClient(
+            config.influxdb.address,
+            config.influxdb.port,
+            config.influxdb.user,
+            config.influxdb.password,
+            config.influxdb.database_name,
+        )
     mqttc = mqtt.Client()
     mqttc.message_callback_add("+/+/tele/+/#", on_message)
     mqttc.on_message = on_generic
-    mqttc.connect(config.mqtt.broker.ip, config.mqtt.broker.port, 60)
+    mqttc.connect(config.mqtt.address, config.mqtt.port, 60)
     mqttc.subscribe("#", 0)
     mqttc.loop_forever()
 

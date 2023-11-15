@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
-from tasmotatoinflux.config import ConfigWrapper
+from tasmotatoinflux.config_wrapper.wrapper import ConfigWrapper
 
 
 @dataclass
@@ -15,6 +15,9 @@ class InfluxPoint:
     datapoints: list[dict[str, any]] = field(init=False)
 
     _blacklist = ["Time", "Sleepmode", "Sleep", "PressureUnit", "TempUnit"]
+
+    def __str__(self) -> str:
+        return f"{'/'.join(self.mqtt_topic)}, {self.measurement=}"
 
     def __post_init__(self) -> None:
         self.datapoints = []
