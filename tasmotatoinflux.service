@@ -4,15 +4,14 @@ After=syslog.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/tasmotatoinflux/tasmotaToInflux
-ExecStart=/home/tasmotatoinflux/venv/bin/python3 -m tasmotatoinflux
+WorkingDirectory=/home/tasmotatoinflux/tasmotatoinflux
+ExecStart=/home/tasmotatoinflux/tasmotatoinflux/.venv/bin/python3 -m tasmotatoinflux
 Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/home/tasmotatoinflux/tasmotatoinflux/env.python
 User=tasmotatoinflux
 Group=tasmotatoinflux
 
 SyslogIdentifier=tasmotatoinflux
-StandardOutput=syslog
-StandardError=syslog
 Restart=always
 RestartSec=5
 
