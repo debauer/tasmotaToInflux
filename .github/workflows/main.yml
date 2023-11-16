@@ -1,0 +1,78 @@
+---
+name: CI
+
+on:
+    push:
+        branches:
+            - "main"
+    pull_request:
+        branches:
+            - "main"
+
+jobs:
+    lock_file_check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: ./.github/actions/setup-poetry
+            - uses: ./.github/actions/dependency-install
+
+            - name: Check lock file
+              run: poetry lock --check
+
+    formatting:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: ./.github/actions/setup-poetry
+            - uses: ./.github/actions/dependency-install
+
+            - name: Formatting
+              run: poetry run ./scripts/ci/format.sh --check
+
+    typing:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: ./.github/actions/setup-poetry
+            - uses: ./.github/actions/dependency-install
+
+            - name: Typing
+              run: poetry run mypy
+
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: ./.github/actions/setup-poetry
+            - uses: ./.github/actions/dependency-install
+
+            - name: Linting
+              run: poetry run ./scripts/ci/pylint.sh
+
+#    unit_test:
+#        runs-on: ubuntu-latest
+#        steps:
+#            - uses: actions/checkout@v3
+#
+#            - uses: ./.github/actions/setup-poetry
+#            - uses: ./.github/actions/dependency-install
+#
+#            - name: Unit Tests
+#              run: poetry run ./scripts/ci/unit_test.sh
+
+#    build:
+#        runs-on: ubuntu-latest
+#        steps:
+#            - uses: actions/checkout@v3
+#
+#            - uses: ./.github/actions/setup-poetry
+#            - uses: ./.github/actions/dependency-install
+#
+#            - name: Build
+#              run: poetry build
+#

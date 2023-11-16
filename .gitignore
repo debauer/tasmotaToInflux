@@ -131,3 +131,5 @@ dmypy.json
 
 # custom
 src/tasmotatoinflux/config.py
+.idea
+xunit-reports
