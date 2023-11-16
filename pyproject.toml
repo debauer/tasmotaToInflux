@@ -22,6 +22,7 @@ overrides = "^7.3.1"
 flatten-json = "^0.1.14"
 python-json-config = "^1.2.3"
 paho-mqtt = "^1.6.1"
+ruff = "^0.1.5"
 
 [tool.poetry.dev-dependencies]
 types-requests = "^2.27.30"
@@ -35,46 +36,6 @@ pytest = "^7.1.2"
 [build-system]
 requires = ["poetry_core>=1.0.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.isort]
-profile = "black"
-
-[tool.pylint.master]
-extension-pkg-whitelist = ["numpy", "cv2"]
-jobs = 0
-
-[tool.pylint.basic]
-good-names = [
-    "i", # iterator
-    "_", "__", "___", # unneeded variable
-    "T", # generic type
-    "id",
-]
-
-[tool.pylint.typecheck]
-# pure c module
-generated-members = ["prctl.set_name"]
-# necessary, at least for systems without cuda
-# otherwise extension-pkg-whitelist should do the trick
-ignored-modules = [
-    "cv2.fisheye"
-]
-
-[tool.pylint.message_control]
-disable = [
-    "missing-module-docstring", "missing-class-docstring", "missing-function-docstring",
-    "no-member", # sadly dataclass_json annotations don't work with pylint
-    "line-too-long",
-    "too-few-public-methods",
-    "duplicate-code",
-    "too-many-ancestors",
-]
-enable = [
-    "useless-suppression"
-]
-
-[tool.pylint.design]
-max-attributes = 10
 
 [tool.mypy]
 python_version = "3.10"
@@ -109,11 +70,47 @@ enable_error_code = [
 # ignores that library has no typing information with it
 [[tool.mypy.overrides]]
 module = [
-    "prctl",
     "paho.*",
-    "snap7.*",
-    "strenum",
-    "dataclasses_json",
-    "flask_cors"
+    "influxdb",
+    "tasmotatoinflux.config",
 ]
 ignore_missing_imports = true
+
+
+[tool.ruff]
+select = ["ALL", "PLR6301"]
+preview = true
+ignore = [
+  "D1",      # docstrings
+  "D406",    # weird section heading things
+  "D203",    # one-blank-line-before-class
+  "D212",    # multi-line-summary-first-line
+  "ERA001",  # Commented out code found
+  "PLC0414", # useless import alias
+  "TCH",     # type checking blocks
+  "TD003",   # todo issue links
+  "ANN10",   # typing self and cls
+  "FIX002",  # TODO anywhere in comments
+  "CPY001",  # Copyright notices until configurable
+  "A003",
+  "E203",    # space before ':' has some inconsitencies with black
+]
+
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.per-file-ignores]
+"src/*" = ["PT"] # pytest rule set
+
+[tool.ruff.flake8-bugbear]
+extend-immutable-calls = ["risk_model.model.types.Sigma"]
+
+[tool.ruff.isort]
+force-single-line = true
+lines-between-types = 1
+lines-after-imports = 2
+known-first-party = ["risk_model"]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"

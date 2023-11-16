@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 
@@ -7,12 +9,14 @@ class Device:
     alias_name: str = "undefined"
     description: str = "no description found"
 
-    def __str__(self):
-        return {
-            "device_name": self.device_name,
-            "description": self.description,
-            "alias_name": self.alias_name,
-        }
+    def __str__(self) -> str:
+        return str(
+            {
+                "device_name": self.device_name,
+                "description": self.description,
+                "alias_name": self.alias_name,
+            },
+        )
 
 
 @dataclass

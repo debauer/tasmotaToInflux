@@ -1,4 +1,9 @@
-from tasmotatoinflux.config_wrapper.types import Device, MqttBroker, InfluxDB
+from __future__ import annotations
+
+from tasmotatoinflux.config_wrapper.types import Device
+from tasmotatoinflux.config_wrapper.types import InfluxDB
+from tasmotatoinflux.config_wrapper.types import MqttBroker
+
 
 DEVICES = [
     # 1wire without "28-" prefix
@@ -7,13 +12,13 @@ DEVICES = [
     Device("steckdose01", "Technik Lager"),
     Device("steckdose02", "Kühlschrank"),
 ]
-
+dummy_pw = "eva"
 MQTT_BROKER = MqttBroker(
     address="herbert",
     port=1883,
     auth=False,
     user="adam",
-    password="eva"
+    password=dummy_pw,
 )
 
 INFLUX_DB = InfluxDB(
@@ -21,7 +26,7 @@ INFLUX_DB = InfluxDB(
     user="tasmota",
     auth=True,
     port=8086,
-    password="asdf",
+    password="asdf",  # noqa: S106
     database_name="tasmota",
-    bulk_size=5
+    bulk_size=5,
 )

@@ -52,7 +52,7 @@ jobs:
             - uses: ./.github/actions/dependency-install
 
             - name: Linting
-              run: poetry run ./scripts/ci/pylint.sh
+              run: poetry run ./scripts/ci/ruff.sh
 
 #    unit_test:
 #        runs-on: ubuntu-latest
