@@ -27,8 +27,25 @@ class InfluxPoint:
         self.datapoints = []
         self.measurement = f"{self.mqtt_topic[0]}_{self.mqtt_topic[1]}"
         self._datapoints()
+        
+    def _fix_arrays(self, values: dict[str, Any]) -> dict[str, Any]:
+        new_dict = {}
+        for key, v in values.items():
+            if isinstance(v, list):
+                for i, element in enumerate(v):
+                    new_dict[f"{key}_{i}"] = element
+            else:
+                new_dict[key] = v
+        return new_dict
+
+    def _check_for_arrays(self, values: dict[str, Any]) -> dict[str, Any]:
+        for key, v in values.items():
+            if isinstance(v, list):
+                return self._fix_arrays(values)
+        return values
 
     def _add_datapoint(self, device: Device, values: dict[str, Any]) -> None:
+        values = self._check_for_arrays(values)
         self.datapoints.append(
             {
                 "measurement": self.measurement,

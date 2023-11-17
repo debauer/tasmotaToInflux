@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from argparse import ArgumentParser
 from argparse import Namespace
@@ -18,8 +19,10 @@ from tasmotatoinflux.config import MQTT_BROKER
 from tasmotatoinflux.config_wrapper.wrapper import ConfigWrapper
 from tasmotatoinflux.points import InfluxPoint
 
+_log = getLogger("default")
+ch = logging.StreamHandler()
+_log.addHandler(ch)
 
-_log = getLogger()
 
 
 def parse() -> Namespace:
@@ -69,6 +72,9 @@ def core() -> None:
     config = ConfigWrapper(MQTT_BROKER, INFLUX_DB, DEVICES)
 
     args = parse()
+    _log.setLevel(logging.INFO)
+    if args.verbose:
+        _log.setLevel(logging.DEBUG)
     dryrun = args.dryrun
 
     if not dryrun:
