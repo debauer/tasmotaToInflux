@@ -58,11 +58,12 @@ class InfluxPoint:
         )
 
     def _to_datapoint(self, values: dict[str, Any]) -> None:
-        config_data = self.config.device("powerplug", self.mqtt_topic[3])
+        config_data = self.config.device(self.mqtt_topic[3])
+        print(config_data)
         self._add_datapoint(config_data, values)
 
     def _to_1wire_datapoint(self, values: dict[str, Any]) -> None:
-        config_data = self.config.device("onewire", values["Id"])
+        config_data = self.config.device( values["Id"])
         values = {"temperature": float(values["Temperature"])}
         self._add_datapoint(config_data, values)
 

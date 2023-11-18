@@ -7,7 +7,6 @@ Type=simple
 WorkingDirectory=/home/tasmotatoinflux/tasmotatoinflux
 ExecStart=/home/tasmotatoinflux/tasmotatoinflux/.venv/bin/python3 -m tasmotatoinflux
 Environment=PYTHONUNBUFFERED=1
-EnvironmentFile=/home/tasmotatoinflux/tasmotatoinflux/env.python
 User=tasmotatoinflux
 Group=tasmotatoinflux
 

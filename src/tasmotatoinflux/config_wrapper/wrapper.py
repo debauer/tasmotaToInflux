@@ -23,7 +23,5 @@ class ConfigWrapper:
             description="device not found in config",
         )
 
-    def device(self, device_type: str, device_name: str) -> Device:
-        if device_type in {"onewire", "powerplug"}:
-            return self._find_device(device_name=device_name)
-        raise NotImplementedError
+    def device(self, device_name: str) -> Device:
+        return self._find_device(device_name=device_name)

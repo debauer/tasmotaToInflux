@@ -1,4 +1,0 @@
-paho-mqtt
-flatten_json
-python-json-config>=1.2.3
-influxdb>=5.2.3
